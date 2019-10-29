@@ -373,7 +373,40 @@ namespace AE_RendererDemo
             //统计变量
             IDataStatistics dataStatistics;
             //存放统计结果
+            IStatisticsResults statisticsResults;
+            //声明一个字体对象
+            stdole.IFontDisp fontDisp;
+            //获取图层Continents
+            geoFeatureLayer = getGeoLayer("北部湾");//北部湾是实例中用到的数据图层名
+            pFtLayer = geoFeatureLayer as IFeatureLayer;
+            //图层类型转换成表
+            table = geoFeatureLayer as ITable;
+            cursor = table.Search(null, true);
+            dataStatistics = new DataStatisticsClass();
+            dataStatistics.Cursor = cursor;
+            //获取图层要素中进行专题地图制图的字段名称, 此实例中所用的数据中字段名为"年"(2010年GDP增长速率)
+            dataStatistics.Field = "年";
+            statisticsResults = dataStatistics.Statistics;
+            if (statisticsResults != null)
+            {
+                //设置背景(Backgroup)的颜色值
+                IFillSymbol fillSymbol = new SimpleFillSymbolClass();
+                fillSymbol.Color = getRGB(195, 255, 255);
+                //设置背景(Backgroud)的线型
+                ISimpleLineSymbol SLS = new SimpleLineSymbolClass();
+                SLS.Color = getRGB(196, 196, 196);
+                SLS.Width = 1.5;
+                fillSymbol.Outline = SLS;
+                //注释：以下提供两种方法进行符号填充。
+                //方法一：利用ESRI特殊符号调用成员进行填充;
+                //方法二:利用简单标记符号(ISimpleMarkerSymol)进行填充
+                ICharacterMarkerSymbol characterMarkerSymbol = new CharacterMarkerSymbolClass();
+                //如ESRI Default Marker是子库名称
+                fontDisp = new stdole.StdFontClass() as stdole.IFontDisp;
+                //调用指定子库
 
+
+            }
 
         }
     }
