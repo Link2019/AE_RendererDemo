@@ -163,6 +163,7 @@
             this.比例符号法渲染ToolStripMenuItem.Name = "比例符号法渲染ToolStripMenuItem";
             this.比例符号法渲染ToolStripMenuItem.Size = new System.Drawing.Size(104, 21);
             this.比例符号法渲染ToolStripMenuItem.Text = "比例符号法渲染";
+            this.比例符号法渲染ToolStripMenuItem.Click += new System.EventHandler(this.比例符号法渲染ToolStripMenuItem_Click);
             // 
             // 点状密度法渲染ToolStripMenuItem
             // 

@@ -356,5 +356,25 @@ namespace AE_RendererDemo
             pRandomColorRamp.CreateRamp(out bture);
             return pRandomColorRamp;
         }
+        /// <summary>
+        /// 比例符号法渲染器(ProportionalSymbolRenderer)——用不同大小的符号绘制要素, 其大小对应某一字段值的比例。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 比例符号法渲染ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //声明IGeoFeatureLayer变量, 提供一个要素图层对成员控制地理特征的入口
+            IGeoFeatureLayer geoFeatureLayer;
+            IFeatureLayer pFtLayer;
+            //声明专题图变量
+            IProportionalSymbolRenderer proportionalSymbolRenderer;
+            ITable table;
+            ICursor cursor;
+            //统计变量
+            IDataStatistics dataStatistics;
+            //存放统计结果
+
+
+        }
     }
 }
