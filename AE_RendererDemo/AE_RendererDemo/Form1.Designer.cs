@@ -156,6 +156,7 @@
             this.唯一值法渲染ToolStripMenuItem.Name = "唯一值法渲染ToolStripMenuItem";
             this.唯一值法渲染ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
             this.唯一值法渲染ToolStripMenuItem.Text = "唯一值法渲染";
+            this.唯一值法渲染ToolStripMenuItem.Click += new System.EventHandler(this.唯一值法渲染ToolStripMenuItem_Click);
             // 
             // 比例符号法渲染ToolStripMenuItem
             // 

@@ -244,8 +244,8 @@ namespace AE_RendererDemo
                 //调用Renderer属性, 具体说明如何通过图层要素渲染器绘制图层
                 pGeoFeatureLayer.Renderer = classBreaksRenderer as IFeatureRenderer;
             }
-            axMapControl1.Refresh();
-            axTOCControl1.Update();
+            axMapControl1.Refresh(); //刷新axMapControl1
+            axTOCControl1.Update(); //更新axTOCControl1
 
 
 
@@ -282,6 +282,79 @@ namespace AE_RendererDemo
             bool bture = true;
             algColorRamp.CreateRamp(out bture);
             return algColorRamp;
+        }
+        /// <summary>
+        /// 唯一值法渲染器(UniqueValueRender)——根据特征的某不同属性值来绘制该特征的符号
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 唯一值法渲染ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //定义IGeoFeatureLayer变量, 提供一个要素图层对成员控制地理特征的入口
+            IGeoFeatureLayer geoFeatureLayer = getGeoLayer("北部湾");
+            //使用查询的方式, 获得参与渲染的记录条数
+            int get_Count = geoFeatureLayer.FeatureClass.FeatureCount(null);
+            //提供操作唯一值的相关成员
+            IUniqueValueRenderer uniqueValueRenderer = new UniqueValueRendererClass();
+            //设置渲染的字段个数范围：0~3个
+            //这里仅设置1个字段
+            uniqueValueRenderer.FieldCount = 1;
+            //设置渲染字段, 并制定到索引处
+            //索引从0开始; 设定渲染字段为"地市名"
+            uniqueValueRenderer.set_Field(0, "地市名");
+            //简单填充符号
+            ISimpleFillSymbol simpleFillSymbol;
+            //获得指向渲染要素的游标
+            IFeatureCursor pFtCursor = geoFeatureLayer.FeatureClass.Search(null, false);
+            IFeature pFeature;
+            if (pFtCursor != null)
+            {
+                //定义枚举颜色带, 调用函数, 生成随机颜色带
+                IEnumColors enumColors = CreateRandomColorRamp(get_Count).Colors;
+                //查找到"地市名"字段的索引(index)
+                int fieldIndex = geoFeatureLayer.FeatureClass.Fields.FindField("地市名");
+                while ((pFeature = pFtCursor.NextFeature()) != null)
+                {
+                    //获取要素值
+                    string nameValue = pFeature.get_Value(fieldIndex).ToString();
+
+                    //实例化填充符号
+                    //使用填充符号来赋值地图的背景值
+                    simpleFillSymbol = new SimpleFillSymbolClass();
+                    //给要素附上样式
+                    simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
+                    //给要素附上颜色
+                    simpleFillSymbol.Color = enumColors.Next() as IColor;
+                    //值和符号对应
+                    uniqueValueRenderer.AddValue(nameValue, "地市", simpleFillSymbol as ISymbol);
+                }
+            }
+            //赋值目标图层的渲染器属性
+            geoFeatureLayer.Renderer = uniqueValueRenderer as IFeatureRenderer;
+            axMapControl1.Refresh(); //刷新axMapControl1
+            axTOCControl1.Update(); //更新axTOCControl1
+        }
+        /// <summary>
+        /// 创建随机的颜色条带
+        /// </summary>
+        /// <param name="Number"></param>
+        /// <returns></returns>
+        private IColorRamp CreateRandomColorRamp(int Number)
+        {
+            //请注意色度、饱和度、最大值、最小值、随机种子数等参数的设定
+            //参数不同, 所产生的色带也不同
+            IRandomColorRamp pRandomColorRamp = new RandomColorRampClass();
+            pRandomColorRamp.StartHue = 0;  //开始色度
+            pRandomColorRamp.EndHue = 360;
+            pRandomColorRamp.MinValue = 99;
+            pRandomColorRamp.MaxValue = 100;
+            pRandomColorRamp.MinSaturation = 15;    //最小饱和度
+            pRandomColorRamp.MaxSaturation = 30;    //最大饱和度
+            pRandomColorRamp.Size = Number; //设置颜色带数量
+            pRandomColorRamp.Seed = 23; //随机数种子
+            bool bture = true;
+            pRandomColorRamp.CreateRamp(out bture);
+            return pRandomColorRamp;
         }
     }
 }
