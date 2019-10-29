@@ -142,12 +142,14 @@
             this.简单符号法渲染ToolStripMenuItem.Name = "简单符号法渲染ToolStripMenuItem";
             this.简单符号法渲染ToolStripMenuItem.Size = new System.Drawing.Size(104, 21);
             this.简单符号法渲染ToolStripMenuItem.Text = "简单符号法渲染";
+            this.简单符号法渲染ToolStripMenuItem.Click += new System.EventHandler(this.简单符号法渲染ToolStripMenuItem_Click);
             // 
             // 分等级法渲染ToolStripMenuItem
             // 
             this.分等级法渲染ToolStripMenuItem.Name = "分等级法渲染ToolStripMenuItem";
             this.分等级法渲染ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
             this.分等级法渲染ToolStripMenuItem.Text = "分等级法渲染";
+            this.分等级法渲染ToolStripMenuItem.Click += new System.EventHandler(this.分等级法渲染ToolStripMenuItem_Click);
             // 
             // 唯一值法渲染ToolStripMenuItem
             // 
