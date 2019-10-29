@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE_RendererDemo", "AE_RendererDemo\AE_RendererDemo.csproj", "{4F074646-E1CA-4992-8DC1-3DC3FAF2EC50}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F074646-E1CA-4992-8DC1-3DC3FAF2EC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F074646-E1CA-4992-8DC1-3DC3FAF2EC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F074646-E1CA-4992-8DC1-3DC3FAF2EC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F074646-E1CA-4992-8DC1-3DC3FAF2EC50}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC0C3589-F63F-44E2-8FB1-A7CA74E2CAE7}
+	EndGlobalSection
+EndGlobal
