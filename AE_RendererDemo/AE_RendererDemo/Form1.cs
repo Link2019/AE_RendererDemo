@@ -247,9 +247,6 @@ namespace AE_RendererDemo
             axMapControl1.Refresh(); //刷新axMapControl1
             axTOCControl1.Update(); //更新axTOCControl1
 
-
-
-
         }
 
         /// <summary>
@@ -451,7 +448,7 @@ namespace AE_RendererDemo
 
         }
         /// <summary>
-        /// 点状密度法渲染专题图(DotDensityRenderer)——在多边形特征中绘制不同密度的点
+        /// 点状密度法渲染器(DotDensityRenderer)——在多边形特征中绘制不同密度的点
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
