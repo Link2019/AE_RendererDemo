@@ -365,49 +365,146 @@ namespace AE_RendererDemo
         {
             //声明IGeoFeatureLayer变量, 提供一个要素图层对成员控制地理特征的入口
             IGeoFeatureLayer geoFeatureLayer;
+            //声明要素图层
             IFeatureLayer pFtLayer;
             //声明专题图变量
+            //在利用该方法进行着色时, 需获得最大和最小标识符号所代表的字段及其各个数值, 还需要确定每个字段数值所匹配的着色符号。
             IProportionalSymbolRenderer proportionalSymbolRenderer;
+            //声明表格
             ITable table;
+            //声明游标
             ICursor cursor;
-            //统计变量
+            //用于统计变量
             IDataStatistics dataStatistics;
-            //存放统计结果
+            //用于存放统计结果
             IStatisticsResults statisticsResults;
             //声明一个字体对象
             stdole.IFontDisp fontDisp;
-            //获取图层Continents
-            geoFeatureLayer = getGeoLayer("北部湾");//北部湾是实例中用到的数据图层名
+            //获取图层
+            geoFeatureLayer = getGeoLayer("北部湾");
+            //强转为要素图层
             pFtLayer = geoFeatureLayer as IFeatureLayer;
             //图层类型转换成表
             table = geoFeatureLayer as ITable;
+            //获取游标
             cursor = table.Search(null, true);
+            //实例化数据统计对象
             dataStatistics = new DataStatisticsClass();
+            //赋游标给数据统计对象的游标
             dataStatistics.Cursor = cursor;
             //获取图层要素中进行专题地图制图的字段名称, 此实例中所用的数据中字段名为"年"(2010年GDP增长速率)
             dataStatistics.Field = "年";
+            //存放统计结果为统计对象的统计数据
             statisticsResults = dataStatistics.Statistics;
+            //如果统计结果不为空
             if (statisticsResults != null)
             {
-                //设置背景(Backgroup)的颜色值
+                //简单填充符号
                 IFillSymbol fillSymbol = new SimpleFillSymbolClass();
+                //设置颜色
                 fillSymbol.Color = getRGB(195, 255, 255);
-                //设置背景(Backgroud)的线型
+                //设置简单线型符号
                 ISimpleLineSymbol SLS = new SimpleLineSymbolClass();
-                SLS.Color = getRGB(196, 196, 196);
-                SLS.Width = 1.5;
-                fillSymbol.Outline = SLS;
-                //注释：以下提供两种方法进行符号填充。
-                //方法一：利用ESRI特殊符号调用成员进行填充;
-                //方法二:利用简单标记符号(ISimpleMarkerSymol)进行填充
+                SLS.Color = getRGB(196, 196, 196);//颜色
+                SLS.Width = 1.5;//宽度
+                fillSymbol.Outline = SLS;//外边界线
+                //利用ESRI特殊符号调用成员进行填充
                 ICharacterMarkerSymbol characterMarkerSymbol = new CharacterMarkerSymbolClass();
-                //如ESRI Default Marker是子库名称
                 fontDisp = new stdole.StdFontClass() as stdole.IFontDisp;
-                //调用指定子库
+                //调用指定子库(ESRI Default Marker是子库名称)
+                fontDisp.Name = "ESRI Default Marker";
 
-
+                //对characterMarkerSymbol的font属性
+                characterMarkerSymbol.Font = fontDisp;
+                //特征标记符号(Character Marker Symbol)的索引值
+                //0xB6是C#特殊的16进制表示方法, 换算为十进制值182
+                characterMarkerSymbol.CharacterIndex = 0xB6;
+                //特征标记符号的颜色
+                characterMarkerSymbol.Color = getRGB(253, 191, 110);
+                //设计特征标记符号的尺寸
+                characterMarkerSymbol.Size = 18;
+                //实例化一个比例符号渲染器
+                proportionalSymbolRenderer = new ProportionalSymbolRendererClass();
+                proportionalSymbolRenderer.ValueUnit = esriUnits.esriUnknownUnits;
+                //获取渲染字段
+                proportionalSymbolRenderer.Field = "年";
+                //是否启用颜色补偿(默认为否)
+                proportionalSymbolRenderer.FlanneryCompensation = false;
+                //赋值统计数据(比例符号渲染器)            
+                //MinDataValue获取数据中最小值
+                proportionalSymbolRenderer.MinDataValue = statisticsResults.Minimum;
+                //获取数据中最大值
+                proportionalSymbolRenderer.MaxDataValue = statisticsResults.Maximum;
+                //在多边形特征上绘制比例标记符号时使用的背景填充符号
+                proportionalSymbolRenderer.BackgroundSymbol = fillSymbol;
+                //用于绘制具有规格化最小数据值的特征的符号。
+                proportionalSymbolRenderer.MinSymbol = characterMarkerSymbol as ISymbol;
+                //目录和图例中显示的符号数为3
+                proportionalSymbolRenderer.LegendSymbolCount = 3;
+                //创建图例, 设置完所有属性后调用。
+                proportionalSymbolRenderer.CreateLegendSymbols();
+                //赋值目标图层的渲染器属性
+                geoFeatureLayer.Renderer = proportionalSymbolRenderer as IFeatureRenderer;
             }
+            axMapControl1.Refresh(); //刷新axMapControl1
+            axTOCControl1.Update(); //更新axTOCControl1
 
+        }
+        /// <summary>
+        /// 点状密度法渲染专题图(DotDensityRenderer)——在多边形特征中绘制不同密度的点
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void 点状密度法渲染ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IGeoFeatureLayer geoFeatureLayer;
+            //定义点密度填充符号变量, 控制点符号的属性
+            IDotDensityFillSymbol dotDensityFillSymbol;
+            //定义点密度渲染对象
+            IDotDensityRenderer dotDensityRenderer;
+            //获取渲染图层
+            geoFeatureLayer = getGeoLayer("北部湾");
+            dotDensityRenderer = new DotDensityRendererClass();
+            IRendererFields rendererFields = dotDensityRenderer as IRendererFields;
+            //设置渲染字段
+            string field1 = "年";
+            rendererFields.AddField(field1, field1);
+            //设置填充颜色和背景色
+            dotDensityFillSymbol = new DotDensityFillSymbolClass();
+            dotDensityFillSymbol.DotSize = 4;
+            dotDensityFillSymbol.Color = getRGB(0, 255, 0);
+
+            //设置渲染符号
+            ISymbolArray symbolArray = dotDensityFillSymbol as ISymbolArray;
+            ISimpleMarkerSymbol simpleMarkerSymbol = new SimpleMarkerSymbolClass();
+            //设置点的符号为圆圈
+            simpleMarkerSymbol.Style = esriSimpleMarkerStyle.esriSMSCircle;
+            simpleMarkerSymbol.Size = 4;
+            simpleMarkerSymbol.Color = getRGB(0, 255, 0);
+            //点符号的外边不填充颜色
+            simpleMarkerSymbol.OutlineColor = getNoRGB();
+            symbolArray.AddSymbol(simpleMarkerSymbol as ISymbol);
+            dotDensityRenderer.DotDensitySymbol = dotDensityFillSymbol;
+            //设置渲染密度
+            dotDensityRenderer.DotValue = 0.003;
+            dotDensityFillSymbol.BackgroundColor = getRGB(255, 255, 255);
+            //创建图例
+            dotDensityRenderer.CreateLegend();
+            geoFeatureLayer.Renderer = dotDensityRenderer as IFeatureRenderer;
+            axMapControl1.Refresh();
+            axTOCControl1.Update();
+
+
+        }
+        /// <summary>
+        /// 不填充颜色
+        /// </summary>
+        /// <returns></returns>
+        private IColor getNoRGB()
+        {
+            IRgbColor pColor = new RgbColorClass();
+            pColor.NullColor = true;
+            return pColor;
         }
     }
 }
