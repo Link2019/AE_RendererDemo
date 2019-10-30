@@ -457,6 +457,7 @@ namespace AE_RendererDemo
         /// <param name="e"></param>
         private void 点状密度法渲染ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //声明IGeoFeatureLayer变量, 提供一个要素图层对成员控制地理特征的入口
             IGeoFeatureLayer geoFeatureLayer;
             //定义点密度填充符号变量, 控制点符号的属性
             IDotDensityFillSymbol dotDensityFillSymbol;
@@ -464,36 +465,43 @@ namespace AE_RendererDemo
             IDotDensityRenderer dotDensityRenderer;
             //获取渲染图层
             geoFeatureLayer = getGeoLayer("北部湾");
+            //实例化点密度渲染对象
             dotDensityRenderer = new DotDensityRendererClass();
+            //强转点密度渲染对象并强转成渲染字段对象
             IRendererFields rendererFields = dotDensityRenderer as IRendererFields;
             //设置渲染字段
             string field1 = "年";
+            //向渲染器添加字段(字段名、别名)
             rendererFields.AddField(field1, field1);
-            //设置填充颜色和背景色
+            //实例化点密度填充符号
             dotDensityFillSymbol = new DotDensityFillSymbolClass();
-            dotDensityFillSymbol.DotSize = 4;
-            dotDensityFillSymbol.Color = getRGB(0, 255, 0);
+            dotDensityFillSymbol.DotSize = 4;//设置点的大小
+            dotDensityFillSymbol.Color = getRGB(0, 255, 0);//设置点的颜色
 
-            //设置渲染符号
+            //将点密度填充符号强转为符号数组成员
             ISymbolArray symbolArray = dotDensityFillSymbol as ISymbolArray;
+            //实例化简单标记符号
             ISimpleMarkerSymbol simpleMarkerSymbol = new SimpleMarkerSymbolClass();
             //设置点的符号为圆圈
             simpleMarkerSymbol.Style = esriSimpleMarkerStyle.esriSMSCircle;
-            simpleMarkerSymbol.Size = 4;
-            simpleMarkerSymbol.Color = getRGB(0, 255, 0);
+            simpleMarkerSymbol.Size = 4;//设置大小
+            simpleMarkerSymbol.Color = getRGB(0, 255, 0);//设置颜色
             //点符号的外边不填充颜色
             simpleMarkerSymbol.OutlineColor = getNoRGB();
+            //将简单标记符号样式增加到符号数组成员中
             symbolArray.AddSymbol(simpleMarkerSymbol as ISymbol);
+            //赋值点密度渲染(dotDensityRenderer)的点密度符号(DotDensitySymbol)属性
             dotDensityRenderer.DotDensitySymbol = dotDensityFillSymbol;
             //设置渲染密度
             dotDensityRenderer.DotValue = 0.003;
+            //设置点密度填充符号的背景色
             dotDensityFillSymbol.BackgroundColor = getRGB(255, 255, 255);
             //创建图例
             dotDensityRenderer.CreateLegend();
+            //赋值目标图层的渲染器属性
             geoFeatureLayer.Renderer = dotDensityRenderer as IFeatureRenderer;
-            axMapControl1.Refresh();
-            axTOCControl1.Update();
-
+            axMapControl1.Refresh(); //刷新axMapControl1
+            axTOCControl1.Update(); //更新axTOCControl1
 
         }
         /// <summary>
@@ -503,8 +511,9 @@ namespace AE_RendererDemo
         private IColor getNoRGB()
         {
             IRgbColor pColor = new RgbColorClass();
+            //.NullColor指示此颜色是否为空。true表明颜色为空
             pColor.NullColor = true;
-            return pColor;
+            return pColor;//返回pColor
         }
     }
 }
