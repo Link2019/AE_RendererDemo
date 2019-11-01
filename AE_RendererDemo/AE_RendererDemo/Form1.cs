@@ -2,6 +2,7 @@
 using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.Geometry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -511,6 +512,131 @@ namespace AE_RendererDemo
             //.NullColor指示此颜色是否为空。true表明颜色为空
             pColor.NullColor = true;
             return pColor;//返回pColor
+        }
+
+        private void 添加地图元素ToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            //排除数据视图下不能插入
+            if (tabControl1.SelectedIndex == 0)
+            {
+                return;
+            }
+            //使用UID识别操作命令
+            UID uid = new UIDClass();
+            if (e.ClickedItem.Text != "")
+            {
+                //e是鼠标操作所返回的对象, 携带了相关的操作信息
+                switch (e.ClickedItem.Text)
+                {
+                    case "图例":
+                        //定义好UID的样式为Carto.legend
+                        uid.Value = "ESRICarto.legend";
+                        //调用自定义方法AddElementInpageLayer, 下同
+                        AddElementInPageLayer(uid);
+                        break;
+                    case "指北针":
+                        //定义好UID的样式为Carto.MarkerNorthArrow
+                        uid.Value = "ESRICarto.MarkerNorthArrow";
+                        AddElementInPageLayer(uid);
+                        break;
+                    case "比例尺":
+                        //定义好UID的样式为ESRICarto.ScaleLine ??
+                        AddScalebar(axPageLayoutControl1.PageLayout, axPageLayoutControl1.ActiveView.FocusMap);
+                        break;
+                    case "文本":
+                        break;
+                    default:
+                        break;
+
+
+                }
+            }
+        }
+        /// <summary>
+        /// 添加比例尺
+        /// </summary>
+        /// <param name="pageLayout"></param>
+        /// <param name="map"></param>
+        private void AddScalebar(IPageLayout pageLayout, IMap map)
+        {
+            if (pageLayout == null || map == null)
+            {
+                return;
+            }
+            IEnvelope envelope = new EnvelopeClass();
+            envelope.PutCoords(1, 1, 3, 2);
+            IUID uid = new UIDClass();
+            uid.Value = "ESRICarto.scalebar";
+            //设定Pagelayout为添加容器
+            IGraphicsContainer graphicsContainer = pageLayout as IGraphicsContainer;
+            IActiveView activeView = pageLayout as IActiveView;
+            IFrameElement frameElement = graphicsContainer.FindFrame(map);
+            IMapFrame mapFrame = frameElement as IMapFrame;
+            IMapSurroundFrame mapSurroundFrame = mapFrame.CreateSurroundFrame(uid as UID, null);
+            IMapSurround pMapSurr = null;
+            IElementProperties pElePro;
+            IScaleBar markerScaleBar = new AlternatingScaleBarClass();
+            //可以有多种比例尺类型
+            markerScaleBar.Division = 4;
+            markerScaleBar.Divisions = 4;
+            markerScaleBar.LabelPosition = esriVertPosEnum.esriAbove;
+            markerScaleBar.Map = map;
+            markerScaleBar.Subdivisions = 2;
+            markerScaleBar.UnitLabel = "";
+            markerScaleBar.UnitLabelGap = 4;
+            markerScaleBar.UnitLabelPosition = esriScaleBarPos.esriScaleBarAbove;
+            markerScaleBar.Units = esriUnits.esriKilometers;
+            pMapSurr = markerScaleBar;
+            mapSurroundFrame.MapSurround = pMapSurr;
+            pElePro = mapSurroundFrame as IElementProperties;
+            pElePro.Name = "my scale";
+            axPageLayoutControl1.AddElement(mapSurroundFrame as IElement, envelope, Type.Missing, Type.Missing, 0);
+            axPageLayoutControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, Type.Missing, null);
+
+        }
+
+        /// <summary>
+        /// 添加图例——根据UID元素添加相应的元素
+        /// </summary>
+        /// <param name="uid"></param>
+        private void AddElementInPageLayer(UID uid)
+        {
+            //实例化一个包络线
+            IEnvelope envelope = new EnvelopeClass();
+            //给定坐标
+            envelope.PutCoords(1, 1, 2, 2);
+            //UID——对象的唯一标识符, 确定COM接口和组件类的一个全局唯一标识符
+            UID localUid = uid;
+            IEnvelope env = envelope;
+            IMapSurround mapSurround;
+            //提供对成员的访问, 控制图形容器
+            IGraphicsContainer graphicsContainer;
+            //提供对成员的访问, 控制map元素的对象, IMapFrame是地图浏览栏对象的默认接口
+            IMapFrame mapFrame;
+            //提供对成员的访问, 控制地图环绕元素映射的接口, 是附属物框架的独享
+            IMapSurroundFrame mapSurroundFrame;
+            //是所有图形元素和框架元素类都要实现的接口
+            IElement element;
+            graphicsContainer = axPageLayoutControl1.PageLayout as IGraphicsContainer;
+            //通过FindFrame方法, 查找axPageLayoutControl1中屏幕包含指定对象的框架
+            mapFrame = graphicsContainer.FindFrame(axPageLayoutControl1.ActiveView.FocusMap) as IMapFrame;
+            //通过CreateSurroundFrame方法创建基于当前地图框下的一个新地图环绕元素(如图例、指北针)
+            mapSurroundFrame = mapFrame.CreateSurroundFrame(localUid, null);
+            //将mapSurroundFrame强转成IElement类型
+            element = mapSurroundFrame as IElement;
+            //设置元素中的几何形状
+            element.Geometry = env;
+            try
+            {
+                ILegend legend = (ILegend)mapSurroundFrame.MapSurround;
+                legend.Title = "图例";
+            }
+            catch
+            { }
+            graphicsContainer.AddElement(element, 0);
+            //设置元素将在axPageLayoutControl屏幕上显示图形
+            element.Activate(axPageLayoutControl1.ActiveView.ScreenDisplay);
+            axPageLayoutControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
         }
     }
 }

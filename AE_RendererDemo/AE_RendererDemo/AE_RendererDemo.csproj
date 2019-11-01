@@ -128,7 +128,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="esriServer">
       <Guid>{18F2FC71-6B30-45B9-B101-037A8B868B66}</Guid>
