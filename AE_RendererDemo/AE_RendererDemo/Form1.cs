@@ -36,6 +36,7 @@ namespace AE_RendererDemo
             添加地图元素ToolStripMenuItem.Enabled = Flag;
             图例ToolStripMenuItem.Enabled = Flag;
             指北针ToolStripMenuItem.Enabled = Flag;
+            比例尺ToolStripMenuItem.Enabled = Flag;
             文本ToolStripMenuItem.Enabled = Flag;
         }
 
@@ -567,8 +568,6 @@ namespace AE_RendererDemo
                         break;
                     default:
                         break;
-
-
                 }
             }
         }
@@ -580,44 +579,40 @@ namespace AE_RendererDemo
         /// <param name="thimaticMapName">图名</param>
         private void AddTextElement(AxPageLayoutControl axPageLayoutControl1, decimal fontsize, string thimaticMapName)
         {
-            IPageLayout pPageLayout;
-            IActiveView pAV;
-            IGraphicsContainer pGraphicsContainer;
-            IPoint pPoint;
-            ITextElement pTextElement;
-            IElement pElement;
-            ITextSymbol pTextSymbol;
-            IRgbColor pColor;
-            pPageLayout = axPageLayoutControl1.PageLayout;
-            pAV = (IActiveView)pPageLayout;
-            pGraphicsContainer = (IGraphicsContainer)pPageLayout;
-            pTextElement = new TextElementClass();
-
+            //创建PageLayout对象
+            IPageLayout pPageLayout = axPageLayoutControl1.PageLayout;
+            //将PageLayout强转成IActiveView
+            IActiveView pAV = (IActiveView)pPageLayout;
+            //将PageLayout强转成IGraphicsContainer
+            IGraphicsContainer graphicsContainer = (IGraphicsContainer)pPageLayout;
+            //实例化文本元素
+            ITextElement pTextElement = new TextElementClass();
+            //实例化字体元素
             IFontDisp pFont = new StdFontClass() as IFontDisp;
             pFont.Bold = true;
             pFont.Name = "宋体";
             pFont.Size = fontsize;
-
-            pColor = new RgbColorClass();
+            //实例化IRgbColor
+            IRgbColor pColor = new RgbColorClass();
             pColor.Red = 0;
             pColor.Green = 0;
             pColor.Blue = 0;
-
-            pTextSymbol = new TextSymbolClass();
+            //实例化文本符号
+            ITextSymbol pTextSymbol = new TextSymbolClass();
             pTextSymbol.Color = (IColor)pColor;
             pTextSymbol.Font = pFont;
-
+            //赋值元素文本和符号
             pTextElement.Text = thimaticMapName;
             pTextElement.Symbol = pTextSymbol;
-
-            pPoint = new PointClass();
+            //实例化一个点
+            IPoint pPoint = new PointClass();
             pPoint.X = 1;
             pPoint.Y = 1;
-
-            pElement = (IElement)pTextElement;
+            //实例化一个元素
+            IElement pElement = (IElement)pTextElement;
             pElement.Geometry = (IGeometry)pPoint;
-            pGraphicsContainer.AddElement(pElement, 0);
-
+            graphicsContainer.AddElement(pElement, 0);
+            //真正实现部分刷新
             pAV.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
         }
 
@@ -630,42 +625,49 @@ namespace AE_RendererDemo
         {
             if (pageLayout == null || map == null)
             {
-                return;
+                return;//当pageLayerout和map为空时返回
             }
+            //实例化一个包络线
             IEnvelope envelope = new EnvelopeClass();
+            //设定坐标
             envelope.PutCoords(1, 1, 3, 2);
+            //实例化一个uid
             IUID uid = new UIDClass();
+            //将uid设置为ESRICarto.scalebar
             uid.Value = "ESRICarto.scalebar";
-            //设定Pagelayout为添加容器
+            //提供对控制图形容器的成员的访问
             IGraphicsContainer graphicsContainer = pageLayout as IGraphicsContainer;
-            IActiveView activeView = pageLayout as IActiveView;
-            IFrameElement frameElement = graphicsContainer.FindFrame(map);
-            IMapFrame mapFrame = frameElement as IMapFrame;
+            //查找map中指定对象的框架
+            IMapFrame mapFrame = graphicsContainer.FindFrame(map) as IMapFrame;
+            //创建基于当前地图框下的一个新地图环绕元素
             IMapSurroundFrame mapSurroundFrame = mapFrame.CreateSurroundFrame(uid as UID, null);
-            IMapSurround pMapSurr = null;
+            //元素属性
             IElementProperties pElePro;
+            //实例化一个比例尺对象
             IScaleBar markerScaleBar = new AlternatingScaleBarClass();
             //可以有多种比例尺类型
-            markerScaleBar.Division = 4;
-            markerScaleBar.Divisions = 4;
+            markerScaleBar.Division = 2;
+            markerScaleBar.Divisions = 2;
             markerScaleBar.LabelPosition = esriVertPosEnum.esriAbove;
             markerScaleBar.Map = map;
             markerScaleBar.Subdivisions = 2;
             markerScaleBar.UnitLabel = "";
             markerScaleBar.UnitLabelGap = 4;
-            markerScaleBar.UnitLabelPosition = esriScaleBarPos.esriScaleBarAbove;
-            markerScaleBar.Units = esriUnits.esriKilometers;
-            pMapSurr = markerScaleBar;
-            mapSurroundFrame.MapSurround = pMapSurr;
+            markerScaleBar.UnitLabelPosition = esriScaleBarPos.esriScaleBarAbove; //位于比例尺上方
+            markerScaleBar.Units = esriUnits.esriKilometers; //千米
+            mapSurroundFrame.MapSurround = markerScaleBar;
+            //将mapSurroundFrame强转为IElementProperties
             pElePro = mapSurroundFrame as IElementProperties;
+            //设置元素Name属性
             pElePro.Name = "my scale";
+            //添加元素至axPageLayoutControl1
             axPageLayoutControl1.AddElement(mapSurroundFrame as IElement, envelope, Type.Missing, Type.Missing, 0);
+            //部分刷新
             axPageLayoutControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, Type.Missing, null);
-
         }
 
         /// <summary>
-        /// 添加图例——根据UID元素添加相应的元素
+        /// 添加图例或指北针——根据UID元素添加相应的元素
         /// </summary>
         /// <param name="uid"></param>
         private void AddElementInPageLayer(UID uid)
