@@ -28,7 +28,17 @@ namespace AE_RendererDemo
         {
             //打开Mxd地图文档
             OpenMxd();
+            ThimaticMapKeys(false);
         }
+        //用于控制“添加地图元素”的方法
+        private void ThimaticMapKeys(bool Flag)
+        {
+            添加地图元素ToolStripMenuItem.Enabled = Flag;
+            图例ToolStripMenuItem.Enabled = Flag;
+            指北针ToolStripMenuItem.Enabled = Flag;
+            文本ToolStripMenuItem.Enabled = Flag;
+        }
+
         /// <summary>
         /// 打开Mxd地图文档
         /// </summary>
@@ -515,7 +525,11 @@ namespace AE_RendererDemo
             pColor.NullColor = true;
             return pColor;//返回pColor
         }
-
+        /// <summary>
+        /// 添加地图元素
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 添加地图元素ToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             //排除数据视图下不能插入
@@ -656,33 +670,26 @@ namespace AE_RendererDemo
         /// <param name="uid"></param>
         private void AddElementInPageLayer(UID uid)
         {
+            //提供对控制图形容器的成员的访问。
+            IGraphicsContainer graphicsContainer = axPageLayoutControl1.PageLayout as IGraphicsContainer;
+            //提供对成员的访问, 控制map元素的对象, IMapFrame是地图浏览栏对象的默认接口
+            //通过FindFrame方法, 查找axPageLayoutControl1中屏幕包含指定对象的框架
+            IMapFrame mapFrame = graphicsContainer.FindFrame(axPageLayoutControl1.ActiveView.FocusMap) as IMapFrame;
+            //提供对成员的访问, 控制地图环绕元素映射的接口, 是附属物框架的对象的默认接口
+            //通过CreateSurroundFrame方法创建基于当前地图框下的一个新地图环绕元素(如图例、指北针)
+            IMapSurroundFrame mapSurroundFrame = mapFrame.CreateSurroundFrame(uid, null);
+            //IElement是所有图形元素和框架元素类都要实现的接口
+            //将mapSurroundFrame强转成IElement类型
+            IElement element = mapSurroundFrame as IElement;
             //实例化一个包络线
             IEnvelope envelope = new EnvelopeClass();
-            //给定坐标
+            //设定坐标
             envelope.PutCoords(1, 1, 2, 2);
-            //UID——对象的唯一标识符, 确定COM接口和组件类的一个全局唯一标识符
-            UID localUid = uid;
-            IEnvelope env = envelope;
-            IMapSurround mapSurround;
-            //提供对成员的访问, 控制图形容器
-            IGraphicsContainer graphicsContainer;
-            //提供对成员的访问, 控制map元素的对象, IMapFrame是地图浏览栏对象的默认接口
-            IMapFrame mapFrame;
-            //提供对成员的访问, 控制地图环绕元素映射的接口, 是附属物框架的独享
-            IMapSurroundFrame mapSurroundFrame;
-            //是所有图形元素和框架元素类都要实现的接口
-            IElement element;
-            graphicsContainer = axPageLayoutControl1.PageLayout as IGraphicsContainer;
-            //通过FindFrame方法, 查找axPageLayoutControl1中屏幕包含指定对象的框架
-            mapFrame = graphicsContainer.FindFrame(axPageLayoutControl1.ActiveView.FocusMap) as IMapFrame;
-            //通过CreateSurroundFrame方法创建基于当前地图框下的一个新地图环绕元素(如图例、指北针)
-            mapSurroundFrame = mapFrame.CreateSurroundFrame(localUid, null);
-            //将mapSurroundFrame强转成IElement类型
-            element = mapSurroundFrame as IElement;
             //设置元素中的几何形状
-            element.Geometry = env;
+            element.Geometry = envelope;
             try
             {
+                //提供对控制图例的成员的访问。
                 ILegend legend = (ILegend)mapSurroundFrame.MapSurround;
                 legend.Title = "图例";
             }
@@ -691,7 +698,39 @@ namespace AE_RendererDemo
             graphicsContainer.AddElement(element, 0);
             //设置元素将在axPageLayoutControl屏幕上显示图形
             element.Activate(axPageLayoutControl1.ActiveView.ScreenDisplay);
+            //部分刷新
             axPageLayoutControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
+        }
+        /// <summary>
+        /// 用来控制“添加地图要素”的控件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            axMapControl1.CurrentTool = null;
+            axPageLayoutControl1.CurrentTool = null;
+            synchronization();
+            if(tabControl1.SelectedIndex==1)
+            {
+                ThimaticMapKeys(true);
+            }
+            else
+            {
+                ThimaticMapKeys(false);
+            }
+         
+        }
+        /// <summary>
+        /// 实现MapControl与Pagelayout的同步方法
+        /// </summary>
+        private void synchronization()
+        {
+            IObjectCopy objectCopy = new ObjectCopyClass();
+            object copyFromMap = axMapControl1.Map;
+            object copyMap = objectCopy.Copy(copyFromMap);
+            object copyToMap = axPageLayoutControl1.ActiveView.FocusMap;
+            objectCopy.Overwrite(copyMap, ref copyToMap);
         }
     }
 }

@@ -33,7 +33,7 @@
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.添加地图元素ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.图例ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.指南针ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.指北针ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.文本ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.分等级法渲染ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -94,7 +94,7 @@
             // 
             this.添加地图元素ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.图例ToolStripMenuItem,
-            this.指南针ToolStripMenuItem,
+            this.指北针ToolStripMenuItem,
             this.比例尺ToolStripMenuItem,
             this.文本ToolStripMenuItem});
             this.添加地图元素ToolStripMenuItem.Name = "添加地图元素ToolStripMenuItem";
@@ -108,22 +108,22 @@
             this.图例ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.图例ToolStripMenuItem.Text = "图例";
             // 
-            // 指南针ToolStripMenuItem
+            // 指北针ToolStripMenuItem
             // 
-            this.指南针ToolStripMenuItem.Name = "指南针ToolStripMenuItem";
-            this.指南针ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.指南针ToolStripMenuItem.Text = "指北针";
+            this.指北针ToolStripMenuItem.Name = "指北针ToolStripMenuItem";
+            this.指北针ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.指北针ToolStripMenuItem.Text = "指北针";
             // 
             // 比例尺ToolStripMenuItem
             // 
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.比例尺ToolStripMenuItem.Text = "比例尺";
             // 
             // 文本ToolStripMenuItem
             // 
             this.文本ToolStripMenuItem.Name = "文本ToolStripMenuItem";
-            this.文本ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.文本ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.文本ToolStripMenuItem.Text = "文本";
             // 
             // 分等级法渲染ToolStripMenuItem
@@ -224,6 +224,7 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(569, 394);
             this.tabControl1.TabIndex = 2;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -330,7 +331,7 @@
         private ESRI.ArcGIS.Controls.AxPageLayoutControl axPageLayoutControl1;
         private System.Windows.Forms.ToolStripMenuItem 添加地图元素ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 图例ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 指南针ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 指北针ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 文本ToolStripMenuItem;
     }
