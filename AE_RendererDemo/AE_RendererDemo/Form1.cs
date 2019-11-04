@@ -1,8 +1,10 @@
 ﻿using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.Controls;
 using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
+using stdole;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -544,6 +546,10 @@ namespace AE_RendererDemo
                         AddScalebar(axPageLayoutControl1.PageLayout, axPageLayoutControl1.ActiveView.FocusMap);
                         break;
                     case "文本":
+                        TextInput txtInput = new TextInput();
+                        txtInput.ShowDialog();
+                        //调用自定义方法加入图名
+                        AddTextElement(axPageLayoutControl1, txtInput.Fontsize, txtInput.ThimaticMapName);
                         break;
                     default:
                         break;
@@ -552,6 +558,55 @@ namespace AE_RendererDemo
                 }
             }
         }
+        /// <summary>
+        /// 添加文本
+        /// </summary>
+        /// <param name="axPageLayoutControl1">目标PageLayoutControl的Name属性</param>
+        /// <param name="fontsize">字体尺寸</param>
+        /// <param name="thimaticMapName">图名</param>
+        private void AddTextElement(AxPageLayoutControl axPageLayoutControl1, decimal fontsize, string thimaticMapName)
+        {
+            IPageLayout pPageLayout;
+            IActiveView pAV;
+            IGraphicsContainer pGraphicsContainer;
+            IPoint pPoint;
+            ITextElement pTextElement;
+            IElement pElement;
+            ITextSymbol pTextSymbol;
+            IRgbColor pColor;
+            pPageLayout = axPageLayoutControl1.PageLayout;
+            pAV = (IActiveView)pPageLayout;
+            pGraphicsContainer = (IGraphicsContainer)pPageLayout;
+            pTextElement = new TextElementClass();
+
+            IFontDisp pFont = new StdFontClass() as IFontDisp;
+            pFont.Bold = true;
+            pFont.Name = "宋体";
+            pFont.Size = fontsize;
+
+            pColor = new RgbColorClass();
+            pColor.Red = 0;
+            pColor.Green = 0;
+            pColor.Blue = 0;
+
+            pTextSymbol = new TextSymbolClass();
+            pTextSymbol.Color = (IColor)pColor;
+            pTextSymbol.Font = pFont;
+
+            pTextElement.Text = thimaticMapName;
+            pTextElement.Symbol = pTextSymbol;
+
+            pPoint = new PointClass();
+            pPoint.X = 1;
+            pPoint.Y = 1;
+
+            pElement = (IElement)pTextElement;
+            pElement.Geometry = (IGeometry)pPoint;
+            pGraphicsContainer.AddElement(pElement, 0);
+
+            pAV.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
+        }
+
         /// <summary>
         /// 添加比例尺
         /// </summary>
